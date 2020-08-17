@@ -1,0 +1,1 @@
+# here we generate Ip list from subdomains and scan them with masscan (maybe generate a good report)

@@ -1,0 +1,1 @@
+# here we test for subdomain takeover mainly with subjack

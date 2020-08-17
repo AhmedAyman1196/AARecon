@@ -1,0 +1,1 @@
+# here we take screen shots for the (live) subdomains
