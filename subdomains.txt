@@ -1,0 +1,11 @@
+account.acronis.com
+www.account.acronis.com
+email.account.acronis.com
+owasp_needs_upgrade_failed_to_send_a_nonce.account.acronis.com
+www.account.acronis.com
+account.acronis.com
+www.account.acronis.com
+email.account.acronis.com
+account.acronis.com
+www.account.acronis.com
+email.account.acronis.com

@@ -1,0 +1,24 @@
+ToDos : 
+
+1 - add threading
+
+2 - check waybackurls for new subdomains
+
+3 - check live urls
+
+4 - alt dns for permutations
+
+5 - check live subdomains
+
+6 - screenshot the live subdomains
+
+7 - subjack
+
+8 - generate ip list
+
+9 - port scan with masscan
+
+
+Notes :
+
+you overwrite the files if they already exist (make it append ??)

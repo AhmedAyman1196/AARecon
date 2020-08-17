@@ -3,17 +3,17 @@ import shlex
 
 def run_command(command):
     res= [] 
-    process = subprocess.Popen(shlex.split(command), stdout=subprocess.PIPE)
+    process = subprocess.Popen(shlex.split(command), stdout=subprocess.PIPE, stderr=None)
     while True:
         output = process.stdout.readline()
-        if output == '' and process.poll() is not None:
+        if output == b'' and process.poll() is not None:
             break
         if output:
-            output.strip()
+            res.append(output.decode("utf-8").strip())
     rc = process.poll()
-    return rc
+    return res
 
-command = "gobuster dns -d domain -w /usr/share/wordlists/dirb/verysmall.txt"
-print(run_command(command))
-
- 
+command = "gobuster dns -d google.com -w /usr/share/wordlists/dirb/verysmall.txt --quiet"
+res = run_command(command)
+for i in res:
+    print(i)

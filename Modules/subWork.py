@@ -1,15 +1,16 @@
 import subprocess
-import sublist3r 
-from subprocess import Popen, PIPE
+import sublist3r
+import shlex
+import subprocess
 from termcolor import colored
 
 class subdomainer:
-	def __init__(self, domainList , sublisterOn , amassPassiveOn , amassBruteOn , gobustOn , wordlist):
+	def __init__(self, domainList , sublisterOn , amassOn , gobustOn , wordlist):
 
 		self.domainList = domainList  # holds the list of root domains
 		self.allsubdomains = []		  # holds the list of all subdmains found
 		self.dict = {}				  # Map between the domain and the subdomains
-		self.wordlist = wordlist
+		self.wordlist = wordlist 	  # holds the wordlist used in bruteforcing
 		self.subdomains = []
 
 		for domain in domainList:
@@ -24,12 +25,12 @@ class subdomainer:
 				self.subdomains.extend(self.gobust(domain))
 				self.updateFiles()
 			
-			if(amassPassiveOn):
-				self.subdomains.extend(self.amassPassive(domain))
-				self.updateFiles()
+			# if(amassPassiveOn):
+			# 	self.subdomains.extend(self.amassPassive(domain))
+			# 	self.updateFiles()
 
-			if(amassBruteOn):		
-				self.subdomains.extend(self.amassBrute(domain))
+			if(amassOn):		
+				self.subdomains.extend(self.amass(domain))
 				self.updateFiles()
 
 
@@ -37,7 +38,7 @@ class subdomainer:
 		self.allsubdomains = sorted(set(self.allsubdomains))
 		if len(self.allsubdomains) > 1:
 			print(colored("Combining gathered subdomains to  subdomains.txt ",'red'))
-			f = open("subdomains.txt", "a")
+			f = open("subdomains.txt", "w")
 			for i in self.allsubdomains:
 				splitted = i.split(".com")
 				for k in splitted:
@@ -56,64 +57,27 @@ class subdomainer:
 		subdomains = [w.replace('<BR>', '\n') for w in subdomains]
 		return subdomains
 
-	
+
+# This turned out to be redundant to the next step
 # amass enum -passive -d target.com
-	def amassPassive(self , domain):
-		print(colored("- Started Amass Passive",'blue'))
-		res = []
-		process = subprocess.Popen(['amass', "enum" ,"-passive", "-d" ,domain], 
-						   stdout=subprocess.PIPE,
-						   universal_newlines=True)
-		while True:
-			output = process.stdout.readline()
-			res.append(output.strip())
-	
-			return_code = process.poll()
-			if return_code is not None:
-				for output in process.stdout.readlines():
-					res.append(output.strip())
-					break
-		return res
+	# def amassPassive(self , domain):
+	# 	print(colored("- Started Amass Passive",'blue'))
+	# 	command = "amass enum -passive -d " + domain  +" --silent"
+	# 	res = run_command(command)
+	# 	return res
 
 #amass enum -brute -d target.com
-	def amassBrute(self, domain):
-		print(colored("- Started Amass Brute force",'blue'))
-
-		res = []
-		process = subprocess.Popen(['amass', "enum" ,"-brute", "-d" ,domain], 
-						   stdout=subprocess.PIPE,
-						   universal_newlines=True)
-		while True:
-			output = process.stdout.readline()
-			res.append(output.strip())
-	
-			return_code = process.poll()
-			if return_code is not None:
-				for output in process.stdout.readlines():
-					res.append(output.strip())
-					break
+	def amass(self, domain):
+		print(colored("- Started Amass ",'blue'))
+		command = "amass enum -brute -d " + domain + " -w " + self.wordlist
+		res = run_command(command)
 		return res
 
 # gobuster dns -d target.com -w subdomaiinWordList.txt
 	def gobust(self,domain):
-		res = []
-		# if !self.bruteforce: # will only work if brute force is on
-		# 	return res
-
 		print(colored("- Started Gobuster",'blue'))
-
-		process = subprocess.Popen(['gobuster', "dns" ,"-d", domain,"-w" , self.wordlist], 
-						   stdout=subprocess.PIPE,
-						   universal_newlines=True)
-		while True:
-			output = process.stdout.readline()
-			res.append(output.strip())
-	
-			return_code = process.poll()
-			if return_code is not None:
-				for output in process.stdout.readlines():
-					res.append(output.strip())
-					break
+		command = "gobuster dns -d " + domain + " -w "+self.wordlist+ " --quiet"
+		res = run_command(command)
 		return res
 
 # updates the subdomains files		
@@ -124,9 +88,8 @@ class subdomainer:
 			self.dict[domain] = self.subdomains
 
 			filename = domain + ".subdomains.txt"
-			f = open(filename, "a")
+			f = open(filename, "w")
 			self.dict[domain] = sorted(set(self.dict[domain]))
-			print("here")
 			for j in self.dict[domain]:
 				splitted = j.split(".com")
 				for k in splitted:
@@ -135,7 +98,18 @@ class subdomainer:
 
 			print(colored("Updated "+filename,'green'))
 			f.close()
-	
+
+def run_command(command):
+	res= [] 
+	process = subprocess.Popen(shlex.split(command), stdout=subprocess.PIPE, stderr=None)
+	while True:
+		output = process.stdout.readline()
+		if output == b'' and process.poll() is not None:
+			break
+		if output:
+			res.append(output.decode("utf-8").strip())
+	rc = process.poll()
+	return res
 
 # how we print this class (for debugging)    	
 	def __str__(self):
