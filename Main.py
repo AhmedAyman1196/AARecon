@@ -3,6 +3,7 @@ import os
 from termcolor import colored
 from Modules import *
 
+#test
 # detect the current working directory and print it
 path = os.getcwd()
 print (colored("We are currently working in %s\n" % path) , "blue")
