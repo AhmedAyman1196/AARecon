@@ -1,6 +1,0 @@
-account.acronis.com
-www.account.acronis.com : 
-No ips found
-email.account.acronis.com : 
-69.20.59.102
-69.20.59.103
