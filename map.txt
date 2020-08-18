@@ -1,0 +1,8 @@
+account.acronis.com : 
+69.20.59.72
+69.20.59.73
+www.account.acronis.com : 
+No ips found
+email.account.acronis.com : 
+69.20.59.102
+69.20.59.103

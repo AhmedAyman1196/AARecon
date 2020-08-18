@@ -1,0 +1,30 @@
+ToDos : 
+
+1 - add threading
+
+2 - check waybackurls for new subdomains
+
+3 - alt dns for permutations : ./altdns.py -i subdomains.txt -o data_output -w words.txt -r -s output.txt 
+
+4 - check live subdomains by query dns server (cat subdomains.txt | httpx -status-code | grep "200") or massscan , dnsmasscan
+
+5 - screenshot the live subdomains (aquatone or eyewitness)
+
+6 - subjack
+
+7 - generate ip list (nslookup)
+
+8 - port scan with masscan (masscan -p <port> <CIDR Range Here> --exclude  <Exclude IP>  -- banners -oX   <Out File Name>)
+
+
+Laters:
+
+use CRT.sh : https://github.com/ghostlulzhacks/CertificateTransparencyLogs
+
+github scrapping : https://github.com/gwen001/github-search/blob/master/github-subdomains.py
+
+Knock.py : https://github.com/guelfoweb/knock
+
+Notes :
+
+you overwrite the files if they already exist (make it append ??)

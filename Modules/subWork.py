@@ -12,6 +12,7 @@ class subdomainer:
 		self.dict = {}				  # Map between the domain and the subdomains
 		self.wordlist = wordlist 	  # holds the wordlist used in bruteforcing
 		self.subdomains = []
+		self.livesubdomains = []
 
 		for domain in domainList:
 			print(colored("Enumerating ",'red') , domain)
@@ -19,10 +20,6 @@ class subdomainer:
 			
 			if(sublisterOn):
 				self.subdomains.extend(self.sublister(domain)) 
-				self.updateFiles()
-			
-			if(gobustOn):
-				self.subdomains.extend(self.gobust(domain))
 				self.updateFiles()
 			
 			# if(amassPassiveOn):
@@ -33,6 +30,9 @@ class subdomainer:
 				self.subdomains.extend(self.amass(domain))
 				self.updateFiles()
 
+			if(gobustOn):
+				self.subdomains.extend(self.gobust(domain))
+				self.updateFiles()
 
 		# combining all into one text file
 		self.allsubdomains = sorted(set(self.allsubdomains))
@@ -49,10 +49,24 @@ class subdomainer:
 		else:
 			print(colored("No subdomains found" , "red"))
 
+		# creating a list of live subdomains
+		self.checkLive()
+		self.livesubdomains = sorted(set(self.livesubdomains))
+		if len(self.livesubdomains) > 1:
+			f = open("livesubdomains.txt", "w")
+			for i in self.livesubdomains:
+				splitted = i.split(".com")
+				for k in splitted:
+					if(k!=""):
+						f.write(k.strip()+".com\n")
+			f.close()
+			print(colored("Done Added livesubdomains.txt ",'green'))
+		else:
+			print(colored("No Live Subdomains Found!" , "red"))
 
 # enumeration using https://github.com/aboul3la/Sublist3r
 	def sublister(self, domain):
-		print(colored("- Started Sublist3r",'blue'))
+		print(colored("- Started Sublist3r ...",'blue'))
 		subdomains = sublist3r.main(domain,40, savefile=None, ports= None, silent=True, verbose= False, enable_bruteforce= False, engines=None)
 		subdomains = [w.replace('<BR>', '\n') for w in subdomains]
 		return subdomains
@@ -68,15 +82,15 @@ class subdomainer:
 
 #amass enum -brute -d target.com
 	def amass(self, domain):
-		print(colored("- Started Amass ",'blue'))
-		command = "amass enum -brute -d " + domain + " -w " + self.wordlist
+		print(colored("- Started Amass ... ",'blue'))
+		command = "amass enum  -d " + domain 
 		res = run_command(command)
 		return res
 
 # gobuster dns -d target.com -w subdomaiinWordList.txt
 	def gobust(self,domain):
-		print(colored("- Started Gobuster",'blue'))
-		command = "gobuster dns -d " + domain + " -w "+self.wordlist+ " --quiet"
+		print(colored("- Started Gobuster ...",'blue'))
+		command = "gobuster dns -d " + domain + " -w "+self.wordlist + " --quiet"
 		res = run_command(command)
 		return res
 
@@ -98,6 +112,13 @@ class subdomainer:
 
 			print(colored("Updated "+filename,'green'))
 			f.close()
+
+# 	httpx -l subdomains.txt
+	def checkLive(self):
+		print(colored("Checking Live subdomains ...",'green'))
+		command = "httpx -l subdomains.txt -silent"
+		res = run_command(command)
+		self.livesubdomains = res
 
 def run_command(command):
 	res= [] 

@@ -1,5 +1,10 @@
-import subprocess
-import shlex
+import socket
+with open("subdomains.txt", "r") as ins:
+    for line in ins:
+        print (socket.gethostbyname(line.strip()))
+
+
+        nslookup account.acronis.com
 
 def run_command(command):
     res= [] 
@@ -12,8 +17,3 @@ def run_command(command):
             res.append(output.decode("utf-8").strip())
     rc = process.poll()
     return res
-
-command = "gobuster dns -d google.com -w /usr/share/wordlists/dirb/verysmall.txt --quiet"
-res = run_command(command)
-for i in res:
-    print(i)
